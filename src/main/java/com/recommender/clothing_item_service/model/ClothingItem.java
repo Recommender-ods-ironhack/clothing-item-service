@@ -31,4 +31,6 @@ public class ClothingItem {
     private Double price;
 
     private String colour;
+
+    private int stock;
 }
