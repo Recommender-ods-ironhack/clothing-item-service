@@ -4,6 +4,7 @@ import com.recommender.clothing_item_service.model.ClothingItem;
 import com.recommender.clothing_item_service.model.ESize;
 import com.recommender.clothing_item_service.model.EStyle;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -28,5 +29,8 @@ public interface ClothingItemRepository extends JpaRepository<ClothingItem, Long
 
     List<ClothingItem> findBySizeAndStyleInAndColorAndPriceLessThanEqual
             (ESize size, List<EStyle> styles,String color, Double maxPrice);
+
+    @Query(value="SELECT * FROM clothing_item ORDER BY stock ASC LIMIT 4")
+    List<ClothingItem> findExcessStockItems();
 
 }
