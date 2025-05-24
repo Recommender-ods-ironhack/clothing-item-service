@@ -16,6 +16,10 @@ public class ClothingItemService {
 
     private final ClothingItemRepository clothingItemRepository;
 
+    public List<ClothingItem> getByNameContains(String name){
+        return clothingItemRepository.findByNameContains(name);
+    }
+
     public ClothingItem getClothingItemById(Long id){
        ClothingItem item = clothingItemRepository.findById(id)
                .orElseThrow(()-> new RuntimeException("Clothing Item doesnt exist with id: "+ id));

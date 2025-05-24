@@ -11,6 +11,7 @@ import java.util.List;
 @Repository
 public interface ClothingItemRepository extends JpaRepository<ClothingItem, Long> {
     //TODO mirar si esto lo hago con specification
+    List<ClothingItem> findByNameContains(String name);
 
     List<ClothingItem> findBySize(ESize size);
 
