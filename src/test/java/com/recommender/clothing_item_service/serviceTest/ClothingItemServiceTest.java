@@ -20,7 +20,7 @@ public class ClothingItemServiceTest{
     @Autowired
     ClothingItemService clothingItemService;
 
-    private
+    private ClothingItem savedItem;
 
     @BeforeEach
     void setUp(){
@@ -37,7 +37,7 @@ public class ClothingItemServiceTest{
 
     @AfterEach
     void tearDown() {
-        clothingItemService.deleteItem(savedItem.getId());
+        clothingItemService.deleteItemById(savedItem.getId());
     }
 
     @Test
@@ -66,7 +66,6 @@ public class ClothingItemServiceTest{
         assertEquals("golden", savedItem.getColor());
         assertEquals(1, savedItem.getStock());
     }
-
 
 
 

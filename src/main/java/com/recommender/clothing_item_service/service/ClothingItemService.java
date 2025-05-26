@@ -7,6 +7,7 @@ import com.recommender.clothing_item_service.model.EStyle;
 import com.recommender.clothing_item_service.repository.ClothingItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -65,6 +66,14 @@ public class ClothingItemService {
     }
     public ClothingItem saveItem(ClothingItem item){
         return clothingItemRepository.save(item);
+    }
+
+    public ResponseEntity<String> deleteItemById(Long id) {
+        ClothingItem item = clothingItemRepository.findById(id)
+                .orElseThrow(() -> new ItemNotFoundException(id));
+
+        clothingItemRepository.deleteById(id);
+        return ResponseEntity.ok("Se ha eliminado el artículo: " + item.getName());
     }
 
 }
