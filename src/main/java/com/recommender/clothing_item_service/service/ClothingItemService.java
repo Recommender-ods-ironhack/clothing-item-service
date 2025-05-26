@@ -1,10 +1,12 @@
 package com.recommender.clothing_item_service.service;
 
+import com.recommender.clothing_item_service.exceptions.ItemNotFoundException;
 import com.recommender.clothing_item_service.model.ClothingItem;
 import com.recommender.clothing_item_service.model.ESize;
 import com.recommender.clothing_item_service.model.EStyle;
 import com.recommender.clothing_item_service.repository.ClothingItemRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,13 +18,13 @@ public class ClothingItemService {
 
     private final ClothingItemRepository clothingItemRepository;
 
-    public List<ClothingItem> getByNameContains(String name){
+    public List<ClothingItem> getItemsByNameContains(String name){
         return clothingItemRepository.findByNameContains(name);
     }
 
-    public ClothingItem getClothingItemById(Long id){
+    public ClothingItem getItemById(Long id){
        ClothingItem item = clothingItemRepository.findById(id)
-               .orElseThrow(()-> new RuntimeException("Clothing Item doesnt exist with id: "+ id));
+               .orElseThrow(()-> new ItemNotFoundException(id));
         return item;
     }
 
@@ -34,8 +36,8 @@ public class ClothingItemService {
         return clothingItemRepository.findBySize(size);
     }
 
-    public List<ClothingItem> getItemsByStyle(EStyle style){
-        return clothingItemRepository.findByStyle(style);
+    public List<ClothingItem> getItemsByStyle(List<EStyle> styles){
+        return clothingItemRepository.findByStyleIn(styles);
     }
 
     public List<ClothingItem> getItemsByColor(String color){
@@ -59,8 +61,10 @@ public class ClothingItemService {
     }
 
     public List<ClothingItem> getExcessStockItems() {
-        return clothingItemRepository.findExcessStockItems();
+        return clothingItemRepository.findTop4ByStock(PageRequest.of(0, 4));
     }
-
+    public ClothingItem saveItem(ClothingItem item){
+        return clothingItemRepository.save(item);
+    }
 
 }

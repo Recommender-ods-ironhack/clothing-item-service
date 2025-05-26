@@ -1,5 +1,6 @@
 package com.recommender.clothing_item_service.repository;
 
+import org.springframework.data.domain.Pageable;
 import com.recommender.clothing_item_service.model.ClothingItem;
 import com.recommender.clothing_item_service.model.ESize;
 import com.recommender.clothing_item_service.model.EStyle;
@@ -16,7 +17,7 @@ public interface ClothingItemRepository extends JpaRepository<ClothingItem, Long
 
     List<ClothingItem> findBySize(ESize size);
 
-    List<ClothingItem> findByStyle(EStyle style);
+    List<ClothingItem> findByStyleIn(List<EStyle> style);
 
     List<ClothingItem> findByColor(String color);
 
@@ -31,7 +32,7 @@ public interface ClothingItemRepository extends JpaRepository<ClothingItem, Long
     List<ClothingItem> findBySizeAndStyleInAndColorAndPriceLessThanEqual
             (ESize size, List<EStyle> styles,String color, Double maxPrice);
 
-    @Query(value="SELECT * FROM clothing_item ORDER BY stock ASC LIMIT 4")
-    List<ClothingItem> findExcessStockItems();
+    @Query("SELECT c FROM ClothingItem c ORDER BY c.stock DESC")
+    List<ClothingItem> findTop4ByStock(Pageable pageable);
 
 }
