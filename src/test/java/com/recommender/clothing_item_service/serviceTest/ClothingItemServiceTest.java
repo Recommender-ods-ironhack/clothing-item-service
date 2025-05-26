@@ -1,5 +1,6 @@
 package com.recommender.clothing_item_service.serviceTest;
 
+import com.recommender.clothing_item_service.exceptions.ItemNotFoundException;
 import com.recommender.clothing_item_service.model.ClothingItem;
 import com.recommender.clothing_item_service.model.ESize;
 import com.recommender.clothing_item_service.model.EStyle;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -20,7 +22,7 @@ public class ClothingItemServiceTest{
     @Autowired
     ClothingItemService clothingItemService;
 
-    private ClothingItem savedItem;
+    private ClothingItem testItem;
 
     @BeforeEach
     void setUp(){
@@ -32,12 +34,12 @@ public class ClothingItemServiceTest{
         item.setColor("silver");
         item.setStock(2);
 
-        var savedItem = clothingItemService.saveItem(item);
+        testItem = clothingItemService.saveItem(item);
     }
 
     @AfterEach
     void tearDown() {
-        clothingItemService.deleteItemById(savedItem.getId());
+        clothingItemService.deleteItemById(testItem.getId());
     }
 
     @Test
@@ -67,8 +69,117 @@ public class ClothingItemServiceTest{
         assertEquals(1, savedItem.getStock());
     }
 
+    @Test
+    @DisplayName("getItemsByNameContains works correctly")
+    public void getItemsByNameContainsTest(){
+        var items = clothingItemService.getItemsByNameContains("Silver");
 
+        assertNotNull(items);
+    }
 
+    @Test
+    @DisplayName("getItemById works correctly")
+    public void getItemByIdTest(){
+        var item = clothingItemService.getItemById(testItem.getId());
 
+        assertNotNull(item);
+        assertEquals(500.0, item.getPrice());
+        assertThrows(ItemNotFoundException.class, () -> {
+            clothingItemService.getItemById(-1L);
+        });
+    }
+
+    @Test
+    @DisplayName("getAllClothingItems works correctly")
+    public void getAllClothingItemsTest(){
+        var items = clothingItemService.getAllClothingItems();
+        assertNotNull(items);
+        assertFalse(items.isEmpty());
+
+    }
+
+    @Test
+    @DisplayName("getItemsBySize works correctly")
+    public void getItemsBySizeTest(){
+        var items = clothingItemService.getItemsBySize(ESize.M);
+
+        assertNotNull(items);
+        assertFalse(items.isEmpty());
+        assertTrue(items.stream().allMatch(item -> item.getSize() == ESize.M));
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("getItemsByStyle works correctly")
+    public void getItemsByStyleTest(){
+        var items = clothingItemService.getItemsByStyle(List.of(EStyle.CASUAL));
+
+        assertNotNull(items);
+        assertFalse(items.isEmpty());
+        assertTrue(items.stream().allMatch(item -> item.getStyle().contains(EStyle.CASUAL)));
+    }
+
+    @Test
+    @DisplayName("getItemsByColor works correctly")
+    public void getItemsByColorTest(){
+        var items = clothingItemService.getItemsByColor("silver");
+
+        assertNotNull(items);
+        assertFalse(items.isEmpty());
+        assertTrue(items.stream().allMatch(item -> item.getColor().equals("silver")));
+    }
+
+    @Test
+    @DisplayName("getItemsCheaperThan works correctly")
+    public void getItemsCheaperThanTest(){
+        var items = clothingItemService.getItemsCheaperThan(600.0);
+
+        assertNotNull(items);
+        assertFalse(items.isEmpty());
+        assertTrue(items.stream().allMatch(item -> item.getPrice() < 600.0));
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("getItemsBySizeAndStyles works correctly")
+    public void getItemsBySizeAndStylesTest() {
+        var items = clothingItemService.getItemsBySizeAndStyles(ESize.M, List.of(EStyle.CASUAL));
+
+        assertNotNull(items);
+        assertFalse(items.isEmpty());
+        assertTrue(items.stream().allMatch(item -> item.getSize() == ESize.M && item.getStyle().contains(EStyle.CASUAL)));
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("getItemsBySizeStylesAndMaxPrice works correctly")
+    public void getItemsBySizeStylesAndMaxPriceTest() {
+        var items = clothingItemService.getItemsBySizeStylesAndMaxPrice(ESize.M, List.of(EStyle.CASUAL), 600.0);
+
+        assertNotNull(items);
+        assertFalse(items.isEmpty());
+        assertTrue(items.stream().allMatch(item -> item.getSize() == ESize.M && item.getStyle().contains(EStyle.CASUAL) && item.getPrice() <= 600.0));
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("getItemsBySizeStylesColorAndMaxPrice works correctly")
+    public void getItemsBySizeStylesColorAndMaxPriceTest() {
+        var items = clothingItemService.getItemsBySizeStylesColorAndMaxPrice(ESize.M, List.of(EStyle.CASUAL), "silver", 600.0);
+
+        assertNotNull(items);
+        assertFalse(items.isEmpty());
+        assertTrue(items.stream().allMatch(item -> item.getSize() == ESize.M && item.getStyle().contains(EStyle.CASUAL) && item.getColor().equals("silver") && item.getPrice() <= 600.0));
+    }
+
+    @Test
+    @DisplayName("getExcessStockItems works correctly")
+    public void getExcessStockItemsTest() {
+        var items = clothingItemService.getExcessStockItems();
+
+        assertNotNull(items);
+        assertFalse(items.isEmpty());
+        items.forEach(item -> assertTrue(item.getStock() > 1));
+    }
 
 }
