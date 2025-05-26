@@ -5,8 +5,7 @@ import com.recommender.clothing_item_service.model.ESize;
 import com.recommender.clothing_item_service.model.EStyle;
 import com.recommender.clothing_item_service.service.ClothingItemService;
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -21,9 +20,29 @@ public class ClothingItemServiceTest{
     @Autowired
     ClothingItemService clothingItemService;
 
+    private
+
+    @BeforeEach
+    void setUp(){
+        ClothingItem item = new ClothingItem();
+        item.setName("Silver Hat");
+        item.setStyle(Set.of(EStyle.CASUAL));
+        item.setSize(ESize.M);
+        item.setPrice(500.0);
+        item.setColor("silver");
+        item.setStock(2);
+
+        var savedItem = clothingItemService.saveItem(item);
+    }
+
+    @AfterEach
+    void tearDown() {
+        clothingItemService.deleteItem(savedItem.getId());
+    }
+
     @Test
     @Transactional
-    @DisplayName("Create item works correctly")
+    @DisplayName("Save item works correctly")
     public void saveClothingItemTest(){
         ClothingItem item = new ClothingItem();
 
@@ -47,5 +66,10 @@ public class ClothingItemServiceTest{
         assertEquals("golden", savedItem.getColor());
         assertEquals(1, savedItem.getStock());
     }
+
+
+
+
+
 
 }
