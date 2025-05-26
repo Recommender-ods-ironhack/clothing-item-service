@@ -20,10 +20,18 @@ public class ClothingItemController {
     private final ClothingItemService clothingItemService;
 
     @GetMapping("/search")
-    public ResponseEntity<?> searchClothingItemsByName(@RequestParam String name) {
+    public ResponseEntity<?> searchClothingItemsByName(@RequestParam(required = false)  String name) {
+
+
         try {
-            List<ClothingItem> items = clothingItemService.getItemsByNameContains(name);
+            List<ClothingItem> items;
+            if (name == null){
+                items = clothingItemService.getAllClothingItems();
+            } else{
+                items = clothingItemService.getItemsByNameContains(name);
+            }
             return ResponseEntity.ok(items);
+
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Error searching items by name: " + e.getMessage());
         }
