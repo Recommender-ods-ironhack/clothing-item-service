@@ -1,4 +1,4 @@
-package com.recommender.clothing_item_service.serviceTest;
+package com.recommender.clothing_item_service.controllerTest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.recommender.clothing_item_service.model.ClothingItem;
@@ -39,6 +39,8 @@ public class ClothingItemControllerTest {
     private MockMvc mockMvc;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    List<ClothingItem> items;
+
 
     @BeforeEach
     public void SetUp(){
@@ -60,12 +62,12 @@ public class ClothingItemControllerTest {
         item2.setColor("golden");
         item2.setStock(1);
 
-        clothingItemRepository.saveAll(List.of(item1,item2));
+        items = clothingItemRepository.saveAll(List.of(item1, item2));
     }
 
     @AfterEach
     void tearDown() {
-        clothingItemRepository.deleteAll();
+        clothingItemRepository.deleteAll(items);
     }
 
     @Test
