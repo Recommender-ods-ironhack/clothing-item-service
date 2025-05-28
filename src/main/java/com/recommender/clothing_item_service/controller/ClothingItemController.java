@@ -1,5 +1,6 @@
 package com.recommender.clothing_item_service.controller;
 
+import com.recommender.clothing_item_service.DTOs.ErrorResponseDTO;
 import com.recommender.clothing_item_service.exceptions.ItemNotFoundException;
 import com.recommender.clothing_item_service.model.ESize;
 import com.recommender.clothing_item_service.model.EStyle;
@@ -7,9 +8,11 @@ import com.recommender.clothing_item_service.model.ClothingItem;
 import com.recommender.clothing_item_service.service.ClothingItemService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -25,7 +28,11 @@ public class ClothingItemController {
             ClothingItem item = clothingItemService.getItemById(id);
             return ResponseEntity.ok(item);
         } catch (ItemNotFoundException e) {
-            return ResponseEntity.status(404).body(e.getMessage());
+            ErrorResponseDTO error = new ErrorResponseDTO();
+            error.setStatus(HttpStatus.NOT_FOUND.value());
+            error.setError("Not found");
+            error.setMessage(e.getMessage());
+            return ResponseEntity.status(404).body(error);
         }
     }
 

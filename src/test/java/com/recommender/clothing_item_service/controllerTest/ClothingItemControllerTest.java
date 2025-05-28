@@ -84,13 +84,10 @@ public class ClothingItemControllerTest {
 
         MvcResult mvcResultNull = mockMvc.perform(get("/api/clothing-item/0"))
                 .andExpect(status().isNotFound())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.TEXT_PLAIN_VALUE))
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 
-        System.out.println();
-        assertTrue(mvcResultNull.getResponse().getContentAsString() == null);
-
-
+        assertTrue(mvcResultNull.getResponse().getContentAsString() != null);
     }
 
 
@@ -150,6 +147,9 @@ public class ClothingItemControllerTest {
             assertTrue(item.getStock() >= 0, "Stock must be zero or more");
         }
     }
+
+
+
 
 
 
