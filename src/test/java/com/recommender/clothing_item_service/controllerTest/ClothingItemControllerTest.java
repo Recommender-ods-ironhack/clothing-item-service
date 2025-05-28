@@ -9,7 +9,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -27,6 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -88,7 +88,7 @@ public class ClothingItemControllerTest {
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 
-        assertTrue(mvcResultNull.getResponse().getContentAsString() != null);
+        assertNotNull(mvcResultNull.getResponse().getContentAsString());
     }
 
 
@@ -108,7 +108,7 @@ public class ClothingItemControllerTest {
             assertTrue(item.getId() != null, "ID cannot be null");
             assertTrue(item.getName() != null, "Name cannot be null");
             assertTrue(!item.getName().isEmpty(), "Name cannot be empty");
-            assertTrue(item.getPrice() > 0 && item.getPrice() != null, "Price must be positive");
+            assertTrue(item.getPrice() > 0, "Price must be positive");
             assertTrue(item.getStock() >= 0, "Stock must be zero or more");
         }
 
@@ -144,7 +144,7 @@ public class ClothingItemControllerTest {
             assertTrue(item.getId() != null, "ID cannot be null");
             assertTrue(item.getName() != null, "Name cannot be null");
             assertTrue(!item.getName().isEmpty(), "Name cannot be empty");
-            assertTrue(item.getPrice() > 0 && item.getPrice() != null, "Price must be positive");
+            assertTrue(item.getPrice() > 0, "Price must be positive");
             assertTrue(item.getStock() >= 0, "Stock must be zero or more");
         }
     }
@@ -176,6 +176,30 @@ public class ClothingItemControllerTest {
 
         assertTrue(itemCheaperThan.get().getPrice()<999);
 
+    }
+    @Test
+    @DisplayName("saveItem works correctly")
+    void saveItemTest() throws Exception {
+        ClothingItem newItem = new ClothingItem();
+        newItem.setName("Item de prueba");
+        newItem.setColor("Blue");
+        newItem.setStyle(Set.of(EStyle.PUNK));
+        newItem.setSize(ESize.XXL);
+        newItem.setPrice(70.0);
+        newItem.setStock(10);
+
+        String itemJson = objectMapper.writeValueAsString(newItem);
+
+        MvcResult mvcResult = mockMvc.perform(post("/api/clothing-item")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(itemJson))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        System.out.println(mvcResult.getResponse().getContentAsString());
+
+        assertTrue(mvcResult.getResponse().getContentAsString().contains("prueba"));
     }
 
 
