@@ -7,7 +7,9 @@ import com.recommender.clothing_item_service.model.EStyle;
 import com.recommender.clothing_item_service.repository.ClothingItemRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -17,8 +19,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 
@@ -71,6 +72,29 @@ public class ClothingItemControllerTest {
     }
 
     @Test
+    @DisplayName("getItemById works correctly")
+    public void getItemByIdTest() throws Exception{
+        MvcResult mvcResult = mockMvc.perform(get("/api/clothing-item/"+ items.getFirst().getId()))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        assertTrue(mvcResult.getResponse().getContentAsString().contains("Silver"));
+        assertNotNull(mvcResult.getResponse().getContentAsString());
+
+        MvcResult mvcResultNull = mockMvc.perform(get("/api/clothing-item/0"))
+                .andExpect(status().isNotFound())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.TEXT_PLAIN_VALUE))
+                .andReturn();
+
+        System.out.println();
+        assertTrue(mvcResultNull.getResponse().getContentAsString() == null);
+
+
+    }
+
+
+    @Test
     void searchClothingItemsByNameTest() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get("/api/clothing-item/search"))
                 .andExpect(status().isOk())
@@ -109,7 +133,7 @@ public class ClothingItemControllerTest {
 
     @Test
     void searchAllClothingItemsTest() throws Exception {
-        MvcResult mvcResult = mockMvc.perform(get("/api/clothing-item/recommendation"))
+        MvcResult mvcResult = mockMvc.perform(get("/api/clothing-item/filtered"))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -126,5 +150,8 @@ public class ClothingItemControllerTest {
             assertTrue(item.getStock() >= 0, "Stock must be zero or more");
         }
     }
+
+
+
 
 }

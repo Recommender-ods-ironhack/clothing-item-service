@@ -19,6 +19,16 @@ public class ClothingItemController {
 
     private final ClothingItemService clothingItemService;
 
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getItemById(@PathVariable Long id) {
+        try {
+            ClothingItem item = clothingItemService.getItemById(id);
+            return ResponseEntity.ok(item);
+        } catch (ItemNotFoundException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        }
+    }
+
     @GetMapping("/search")
     public ResponseEntity<?> searchClothingItemsByName(@RequestParam(required = false)  String name) {
 
@@ -37,7 +47,7 @@ public class ClothingItemController {
         }
     }
 
-    @GetMapping("/recommendation")
+    @GetMapping("/filtered")
     public ResponseEntity<?> getFilteredClothingItems(
             @RequestParam(required = false) ESize size,
             @RequestParam(required = false) List<EStyle> styles,
@@ -73,15 +83,6 @@ public class ClothingItemController {
         }
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getItemById(@PathVariable Long id) {
-        try {
-            ClothingItem item = clothingItemService.getItemById(id);
-            return ResponseEntity.ok(item);
-        } catch (ItemNotFoundException e) {
-            return ResponseEntity.status(404).body(e.getMessage());
-        }
-    }
 
     @GetMapping("/excess-stock")
     public ResponseEntity<?> getExcessStockItems() {
