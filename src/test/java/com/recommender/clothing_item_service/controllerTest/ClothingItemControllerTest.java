@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -51,7 +52,7 @@ public class ClothingItemControllerTest {
         item1.setName("Silver Hat");
         item1.setStyle(Set.of(EStyle.CASUAL));
         item1.setSize(ESize.M);
-        item1.setPrice(500.0);
+        item1.setPrice(1000.0);
         item1.setColor("silver");
         item1.setStock(2);
 
@@ -148,7 +149,34 @@ public class ClothingItemControllerTest {
         }
     }
 
+    @Test
+    @DisplayName("getFilteredClothingItems works correctly")
+    void getFilteredClothingItemsTest() throws Exception {
 
+        MvcResult mvcResultSize = mockMvc.perform(get("/api/clothing-item/filtered?size=M"))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        String jsonResponseSize = mvcResultSize.getResponse().getContentAsString();
+        ClothingItem[] itemsArraySize = objectMapper.readValue(jsonResponseSize, ClothingItem[].class);
+        var itemSize = Arrays.stream(itemsArraySize).findFirst();
+
+        assertSame(ESize.M, itemSize.get().getSize());
+
+        MvcResult mvcResultCheaperThan = mockMvc.perform(get("/api/clothing-item/filtered?maxPrice=999"))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        String jsonResponseCheaperThan = mvcResultSize.getResponse().getContentAsString();
+        ClothingItem[] itemsArrayCheaperThan = objectMapper.readValue(jsonResponseCheaperThan, ClothingItem[].class);
+        var itemCheaperThan = Arrays.stream(itemsArrayCheaperThan).findFirst();
+
+
+        assertTrue(itemCheaperThan.get().getPrice()<999);
+
+    }
 
 
 
