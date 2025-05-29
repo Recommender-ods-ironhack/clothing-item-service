@@ -68,12 +68,9 @@ public class ClothingItemService {
         return clothingItemRepository.save(item);
     }
 
-    public ResponseEntity<String> deleteItemById(Long id) {
-        ClothingItem item = clothingItemRepository.findById(id)
-                .orElseThrow(() -> new ItemNotFoundException(id));
-
+    public ClothingItem deleteItemById(Long id){
+        var user= getItemById(id);
         clothingItemRepository.deleteById(id);
-        return ResponseEntity.ok("Se ha eliminado el artículo: " + item.getName());
+        return user;
     }
-
 }

@@ -7,6 +7,7 @@ import com.recommender.clothing_item_service.model.EStyle;
 import com.recommender.clothing_item_service.model.ClothingItem;
 import com.recommender.clothing_item_service.service.ClothingItemService;
 import jakarta.validation.Valid;
+import jakarta.ws.rs.Path;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -107,6 +108,21 @@ public class ClothingItemController {
             return ResponseEntity.ok(savedItem);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Error saving item.");
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteItem(@PathVariable Long id){
+        try{
+            ClothingItem deletedClothingItem = clothingItemService.deleteItemById(id);
+            String message = "Deleted clothing item: " + deletedClothingItem.getName();
+            return  ResponseEntity.ok(message);
+        } catch (ItemNotFoundException e){
+            ErrorResponseDTO error = new ErrorResponseDTO();
+            error.setStatus(HttpStatus.NOT_FOUND.value());
+            error.setError("Not found");
+            error.setMessage(e.getMessage());
+            return ResponseEntity.status(404).body(error);
         }
     }
 }
